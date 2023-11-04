@@ -29,40 +29,6 @@ loading_Manager.onProgress = (url, loaded, total) => {
     document.getElementById('progress').innerHTML = Math.floor(loading_Bar.value) + '%'
 }
 
-// Lights
-
-const spot_Light = new THREE.SpotLight(0xffffff, 30, 20, 0.7, 0.75, 0.2)
-spot_Light.position.set(0,8,8);
-spot_Light.lookAt(0,0,0)
-
-scene.add(spot_Light);
-
-gui.add(spot_Light, 'angle')
-gui.add(spot_Light, 'decay')
-gui.add(spot_Light, 'penumbra')
-
-const spotLight_Helper = new THREE.SpotLightHelper( spot_Light );
-scene.add( spotLight_Helper);
-
-// Ambient Light
-const ambient_Light = new THREE.AmbientLight(0xd6edff, 0.2)
-scene.add(ambient_Light)
-
-/**
- * Setting the Scene Environment
- */
-
-scene.fog = new THREE.Fog(0x2E0423, 15, 30)
-
-const hdrload = new RGBELoader(loading_Manager)
-hdrload.load('./ENV.hdr',
-    (hdrBG) => {
-        hdrBG.mapping = THREE.EquirectangularReflectionMapping
-        // scene.background = hdrBG
-        scene.environment = hdrBG
-    }
-)
-
 /**
  * Functions to modify the materials of imported objects.
  */
@@ -79,48 +45,6 @@ function normalToBump(material, bumpScale) {
   material.bumpMap = material.map
   material.bumpScale = bumpScale
 }
-
-/**
- * glTF Loader
- */
-
-const glb_Card_Model = new THREE.Object3D()
-
-const BG_Model = new THREE.Group()
-
-const loader = new GLTFLoader(loading_Manager)
-
-// Loading Ground Model
-loader.load('./W_Card.glb',
-    (gltfScene) => {
-        // const loadedmodel = gltfScene
-        // console.log(loadedmodel.scene)
-
-        gltfScene.scene.traverse((child) => {
-            if(child.isMesh) {
-                // child.material.side = THREE.FrontSide
-                child.material.normalScale.x = 1.2
-                child.material.normalScale.y = -1.2
-            }
-        })
-
-        glb_Card_Model.add(gltfScene.scene)
-        glb_Card_Model.matrixAutoUpdate = false
-    }
-)
-
-// Adding a Ground Plane
-const ground_Plane = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshPhongMaterial({ color: 0x7D0950, depthWrite: true }));
-ground_Plane.position.z = -1
-ground_Plane.receiveShadow = true;
-
-const ground_Plane2 = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshPhongMaterial({ color: 0x7D0950, depthWrite: true }));
-ground_Plane2.position.y = -2
-ground_Plane2.rotation.x = -Math.PI/2
-ground_Plane2.receiveShadow = true;
-
-BG_Model.add(glb_Card_Model, ground_Plane, ground_Plane2)
-scene.add(BG_Model)
 
 /**
  * Sizes
@@ -165,7 +89,7 @@ const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 controls.enablePan = false
 controls.target.x = 0
-controls.maxPolarAngle = Math.PI/2
+controls.maxPolarAngle = Math.PI/1.85
 controls.minPolarAngle = Math.PI/3
 controls.minAzimuthAngle = -0.5
 controls.maxAzimuthAngle = 0.5
@@ -173,25 +97,6 @@ controls.maxDistance = 12
 controls.minDistance = 5
 
 // console.log(controls)
-
-/**
-* Animating Camera when Loading Done
-*/
-
-loading_Manager.onLoad = () => {
-  gsap.to(loading_Bar_Container, {
-      opacity: 0,
-      duration: 0.2,
-      onComplete: () => {
-          loading_Bar_Container.style.display = 'none'
-
-          gsap.to(camera.position, {
-              x: -5, y: 5, z: 12,
-              duration: 2
-          })
-      }
-  })
-}
 
 /**
  * Renderer
@@ -210,15 +115,132 @@ renderer.toneMappingExposure = 0.2
 
 renderer.autoClear = false
 
-// window.addEventListener('click', () => {
-//   console.log(controls.getAzimuthalAngle());
-// })
+// Lights
+
+const spot_Light = new THREE.SpotLight(0xffffff, 30, 20, 0.7, 0.75, 0.2)
+spot_Light.position.set(0,8,8);
+spot_Light.lookAt(0,0,0)
+
+scene.add(spot_Light);
+
+// gui.add(spot_Light, 'angle')
+// gui.add(spot_Light, 'decay')
+// gui.add(spot_Light, 'penumbra')
+
+// const spotLight_Helper = new THREE.SpotLightHelper( spot_Light );
+// scene.add( spotLight_Helper);
+
+// Ambient Light
+const ambient_Light = new THREE.AmbientLight(0xd6edff, 0.2)
+scene.add(ambient_Light)
+
+/**
+ * Setting the Scene Environment
+ */
+
+scene.fog = new THREE.Fog(0x2E0423, 15, 30)
+
+const hdrload = new RGBELoader(loading_Manager)
+hdrload.load('./ENV.hdr',
+    (hdrBG) => {
+        hdrBG.mapping = THREE.EquirectangularReflectionMapping
+        // scene.background = hdrBG
+        scene.environment = hdrBG
+    }
+)
+
+/**
+ * glTF Loader
+ */
+
+const glb_Card_Model = new THREE.Object3D()
+
+const BG_Model = new THREE.Group()
+
+const loader = new GLTFLoader(loading_Manager)
+
+// Loading Ground Model
+loader.load('./W_Card.glb',
+    (gltfScene) => {
+        // const loadedmodel = gltfScene
+        // console.log(loadedmodel.scene)
+
+        gltfScene.scene.traverse((child) => {
+            if(child.isMesh) {
+                // child.material.side = THREE.FrontSide
+                child.material.normalScale.x = 1.2
+                child.material.normalScale.y = -1.2
+
+                if(child.material.map != null && child.material.map.isTexture) {
+                  // console.log(child.material.map)
+                  child.material.map.minFilter = THREE.LinearFilter
+                  child.material.map.magFilter = THREE.NearestFilter
+                }
+            }
+        })
+
+        glb_Card_Model.add(gltfScene.scene)
+        glb_Card_Model.matrixAutoUpdate = false
+    }
+)
+
+// Adding a Ground Plane
+const wall_Plane = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshPhongMaterial({ color: 0x7D0950, depthWrite: true }));
+wall_Plane.position.z = -1
+wall_Plane.receiveShadow = true;
+
+const ground_Plane = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshPhongMaterial({ color: 0x7D0950, depthWrite: true }));
+ground_Plane.position.y = -2
+ground_Plane.rotation.x = -Math.PI/2
+ground_Plane.receiveShadow = true;
+
+BG_Model.add(glb_Card_Model, wall_Plane, ground_Plane)
+scene.add(BG_Model)
 
 /**
  * Animate
  */
 
-// objectClickListener(camera, ButtonScene, raycaster, circle_button_sphere, showLanes)
+/**
+* Animating Camera when Loading Done
+*/
+
+loading_Manager.onLoad = () => {
+  gsap.to(loading_Bar_Container, {
+      opacity: 0,
+      duration: 1,
+      onStart: () => {
+        gsap.to(camera.position, {
+          x: -5, y: 5, z: 12,
+          duration: 3
+      })
+      },
+      onComplete: () => {
+          loading_Bar_Container.style.display = 'none'
+      }
+  })
+}
+
+// window.addEventListener('click', () => {
+//   console.log(controls.getAzimuthalAngle());
+// })
+
+window.addEventListener('auxclick', () => {
+  // console.log(glb_Card_Model.children[0].children[0])
+  gsap.to(glb_Card_Model.children[0].children[0].position, {
+    x: 4.5,
+    duration: 1,
+    onComplete: () => {
+        gsap.to(glb_Card_Model.children[0].children[0].position, {
+          x:0, z:0.5,
+          duration: 1.5,
+          onComplete: () => {
+            console.log('done')
+          }
+        })
+    }
+})
+})
 
 const clock = new THREE.Clock()
 
