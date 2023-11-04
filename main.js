@@ -31,17 +31,18 @@ loading_Manager.onProgress = (url, loaded, total) => {
 
 // Lights
 
-const direct_Light = new THREE.DirectionalLight(0xffffff, 8)
-direct_Light.target.x = 0
-direct_Light.position.x = 0
-direct_Light.position.y = 0
-direct_Light.position.z = 15
+const spot_Light = new THREE.SpotLight(0xffffff, 30, 20, 0.7, 0.75, 0.2)
+spot_Light.position.set(0,8,8);
+spot_Light.lookAt(0,0,0)
 
-scene.add(direct_Light)
+scene.add(spot_Light);
 
-gui.add(direct_Light.position, 'x')
-gui.add(direct_Light.position, 'y')
-gui.add(direct_Light.position, 'z')
+gui.add(spot_Light, 'angle')
+gui.add(spot_Light, 'decay')
+gui.add(spot_Light, 'penumbra')
+
+const spotLight_Helper = new THREE.SpotLightHelper( spot_Light );
+scene.add( spotLight_Helper);
 
 // Ambient Light
 const ambient_Light = new THREE.AmbientLight(0xd6edff, 0.2)
@@ -51,10 +52,10 @@ scene.add(ambient_Light)
  * Setting the Scene Environment
  */
 
-scene.fog = new THREE.Fog(0xd6edff, 10, 20)
+scene.fog = new THREE.Fog(0x2E0423, 15, 30)
 
 const hdrload = new RGBELoader(loading_Manager)
-hdrload.load('./public/ENV.hdr',
+hdrload.load('./ENV.hdr',
     (hdrBG) => {
         hdrBG.mapping = THREE.EquirectangularReflectionMapping
         // scene.background = hdrBG
@@ -90,23 +91,35 @@ const BG_Model = new THREE.Group()
 const loader = new GLTFLoader(loading_Manager)
 
 // Loading Ground Model
-loader.load('./public/W_Card.glb',
+loader.load('./W_Card.glb',
     (gltfScene) => {
         // const loadedmodel = gltfScene
         // console.log(loadedmodel.scene)
 
-        // gltfScene.scene.traverse((child) => {
-        //     if(child.isMesh) {
-        //         child.material.side = THREE.FrontSide
-        //     }
-        // })
+        gltfScene.scene.traverse((child) => {
+            if(child.isMesh) {
+                // child.material.side = THREE.FrontSide
+                child.material.normalScale.x = 1.2
+                child.material.normalScale.y = -1.2
+            }
+        })
 
         glb_Card_Model.add(gltfScene.scene)
         glb_Card_Model.matrixAutoUpdate = false
     }
 )
 
-BG_Model.add(glb_Card_Model)
+// Adding a Ground Plane
+const ground_Plane = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshPhongMaterial({ color: 0x7D0950, depthWrite: true }));
+ground_Plane.position.z = -1
+ground_Plane.receiveShadow = true;
+
+const ground_Plane2 = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshPhongMaterial({ color: 0x7D0950, depthWrite: true }));
+ground_Plane2.position.y = -2
+ground_Plane2.rotation.x = -Math.PI/2
+ground_Plane2.receiveShadow = true;
+
+BG_Model.add(glb_Card_Model, ground_Plane, ground_Plane2)
 scene.add(BG_Model)
 
 /**
@@ -152,10 +165,10 @@ const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 controls.enablePan = false
 controls.target.x = 0
-controls.maxPolarAngle = Math.PI/1.5
+controls.maxPolarAngle = Math.PI/2
 controls.minPolarAngle = Math.PI/3
-controls.minAzimuthAngle = -1
-controls.maxAzimuthAngle = 1
+controls.minAzimuthAngle = -0.5
+controls.maxAzimuthAngle = 0.5
 controls.maxDistance = 12
 controls.minDistance = 5
 
@@ -197,9 +210,9 @@ renderer.toneMappingExposure = 0.2
 
 renderer.autoClear = false
 
-window.addEventListener('click', () => {
-  console.log(controls.getAzimuthalAngle());
-})
+// window.addEventListener('click', () => {
+//   console.log(controls.getAzimuthalAngle());
+// })
 
 /**
  * Animate
