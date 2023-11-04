@@ -1,4 +1,5 @@
 {
+  "homepage": "https://literalwizard.github.io/W_Card_3D_Demo",
   "name": "w-card-3d-demo",
   "private": true,
   "version": "0.0.0",
@@ -7,6 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "predeploy": "pnpm run build",
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
