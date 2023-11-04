@@ -68,3 +68,31 @@ label {
     bottom: 10px;
     left: 30px;
 }
+
+.open-button {
+    position: absolute;
+    width: 100%;
+    height: 10%;
+    bottom: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+.map-button {
+    position: absolute;
+    width: 100%;
+    height: 10%;
+    bottom: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    z-index: 1;
+}
+
+.btn {
+    font-family: 'Kanit', 'Roboto', sans-serif;
+    border-radius: 10px;
+}

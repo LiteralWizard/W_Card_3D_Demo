@@ -10,7 +10,7 @@ import * as dat from 'dat.gui'
 import gsap from 'gsap'
 
 // Debug
-const gui = new dat.GUI()
+// const gui = new dat.GUI()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -225,21 +225,32 @@ loading_Manager.onLoad = () => {
 //   console.log(controls.getAzimuthalAngle());
 // })
 
-window.addEventListener('auxclick', () => {
+const open_Button = document.getElementById('open_button')
+open_Button.addEventListener('click', () => {
   // console.log(glb_Card_Model.children[0].children[0])
   gsap.to(glb_Card_Model.children[0].children[0].position, {
     x: 4.5,
     duration: 1,
     onComplete: () => {
-        gsap.to(glb_Card_Model.children[0].children[0].position, {
-          x:0, z:0.5,
-          duration: 1.5,
-          onComplete: () => {
-            console.log('done')
-          }
-        })
+      gsap.to(glb_Card_Model.children[0].children[0].position, {
+        x:0, z:0.5,
+        duration: 1.5,
+        onStart: () => {
+          gsap.to(open_Button, {opacity: 0, duration: 1,
+            onComplete: () => {
+              open_Button.style.visibility = 'hidden'
+              // console.log(document.getElementById('map_button').style)
+              document.getElementById('map_button').style.visibility = 'visible'
+            }
+          })
+        }
+      })
     }
+  })
 })
+
+document.getElementById('map_button').addEventListener('click', () => {
+  window.open('https://goo.gl/maps/CTaSeRSC7cHaXBc27', '_blank')
 })
 
 const clock = new THREE.Clock()
