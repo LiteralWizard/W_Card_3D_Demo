@@ -4,10 +4,14 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>Walima Invitation</title>
   </head>
   <body>
-    <div id="app"></div>
     <script type="module" src="/main.js"></script>
+    <div class="loading-bar-container">
+        <label for="loading-bar">Loading <span id="progress"></span></label>
+        <progress id="loading-bar" value="0" max="100"></progress>
+    </div>
+    <canvas class="webgl"></canvas>
   </body>
 </html>
