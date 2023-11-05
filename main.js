@@ -217,6 +217,7 @@ loading_Manager.onLoad = () => {
       },
       onComplete: () => {
           loading_Bar_Container.style.display = 'none'
+          document.getElementById('open_button').style.visibility = 'visible'
       }
   })
 }
